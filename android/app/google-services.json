@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "535095414450",
+    "project_id": "bloc-autoroute-login",
+    "storage_bucket": "bloc-autoroute-login.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:535095414450:android:e03497caaf7a5844d703ab",
+        "android_client_info": {
+          "package_name": "com.example.firebasebloc"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAAEciAsJbq6hMTrskLLHZwxCxUQDTsBLQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

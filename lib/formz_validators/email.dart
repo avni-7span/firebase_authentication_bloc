@@ -3,6 +3,7 @@ import 'package:formz/formz.dart';
 enum EmailValidationError { invalid }
 
 class Email extends FormzInput<String, EmailValidationError> {
+  // for user that entered first time , then there must not error messages therefore pure
   const Email.pure() : super.pure('');
 
   const Email.dirty([super.value = '']) : super.dirty();

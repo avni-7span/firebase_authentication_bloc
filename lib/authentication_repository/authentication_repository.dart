@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:firebasebloc/authentication_repository/user_model.dart';
-import 'package:cached/cached.dart';
 
 class LogOutFailure implements Exception {}
 
@@ -84,7 +83,7 @@ class AuthenticationRepository {
 
   final firebase_auth.FirebaseAuth _firebaseAuth;
 
-  static const userCacheKey = '__user_cache_key__';
+  // static const userCacheKey = '__user_cache_key__';
 
   firebase_auth.User? get currentUser {
     return firebase_auth.FirebaseAuth.instance.currentUser;

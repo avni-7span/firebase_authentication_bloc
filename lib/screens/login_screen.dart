@@ -26,7 +26,9 @@ class LoginScreen extends StatelessWidget {
         body: BlocListener<LoginCubit, LoginState>(
           listenWhen: (previous, current) => previous.status != current.status,
           listener: (context, state) {
-            if (state.status.isFailure) {
+            if (state.status.isSuccess) {
+              context.pushRoute(const ProfileRoute());
+            } else if (state.status.isFailure) {
               ScaffoldMessenger.of(context)
                 ..hideCurrentSnackBar
                 ..showSnackBar(
@@ -124,7 +126,7 @@ class _LoginButton extends StatelessWidget {
         return state.status.isInProgress
             ? const Center(child: CircularProgressIndicator())
             : ElevatedButton(
-                key: const Key('LoginScreen_loginbutton'),
+                key: const Key('LoginScreen_loginButton'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.cyan,
                   shape: RoundedRectangleBorder(
@@ -149,16 +151,14 @@ class _SignupButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      key: const Key('LoginScreen_naviagte_signup'),
+      key: const Key('LoginScreen_navigate_signup'),
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.cyan,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
       ),
-      onPressed: () async {
-        await context.pushRoute(const SignUpRoute());
-      },
+      onPressed: () => context.pushRoute(const SignUpRoute()),
       child: const Text(
         'CREATE ACCOUNT',
         style: TextStyle(color: Colors.black),

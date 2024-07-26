@@ -34,7 +34,7 @@ abstract class $AppRoute extends _i5.RootStackRouter {
     SignUpRoute.name: (routeData) {
       return _i5.AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: const _i3.SignUpScreen(),
+        child: _i5.WrappedRoute(child: const _i3.SignUpScreen()),
       );
     },
     SplashRoute.name: (routeData) {

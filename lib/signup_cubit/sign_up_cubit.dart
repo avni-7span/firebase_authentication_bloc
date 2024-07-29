@@ -31,9 +31,8 @@ class SignUpCubit extends Cubit<SignUpState> {
     emit(
       state.copyWith(
         password: password,
-        // confirmedPassword: confirmedPassword,
-        isValid:
-            Formz.validate([password, state.confirmedPassword, state.email]),
+        confirmedPassword: confirmedPassword,
+        isValid: Formz.validate([password, confirmedPassword, state.email]),
       ),
     );
   }
@@ -44,31 +43,46 @@ class SignUpCubit extends Cubit<SignUpState> {
     emit(
       state.copyWith(
         confirmedPassword: confirmedPassword,
-        isValid: Formz.validate([state.password, confirmedPassword]),
+        isValid:
+            Formz.validate([state.password, confirmedPassword, state.email]),
       ),
     );
   }
 
-  Future onSignUp() async {
-    if (!state.isValid) return;
+  Future<void> onSignUp() async {
+    final email = Email.dirty(state.email.value);
+    final password = Password.dirty(state.password.value);
+    final confirmPassword = ConfirmedPassword.dirty(password: password.value);
     emit(
-      state.copyWith(status: FormzSubmissionStatus.inProgress),
+      state.copyWith(
+        email: email,
+        password: password,
+        isValid: Formz.validate([email, password, confirmPassword]),
+      ),
     );
-    try {
-      await _authenticationRepository.signUp(
-          email: state.email.value, password: state.password.value);
+    if (!state.isValid) return;
+    if (state.isValid) {
       emit(
-        state.copyWith(status: FormzSubmissionStatus.success),
+        state.copyWith(status: FormzSubmissionStatus.inProgress),
       );
-    } on SignUpWithEmailAndPasswordFailure catch (e) {
-      emit(
-        state.copyWith(
-            status: FormzSubmissionStatus.failure, errorMessage: e.message),
-      );
-    } catch (e) {
-      emit(
-        state.copyWith(status: FormzSubmissionStatus.failure),
-      );
+      try {
+        emit(state.copyWith(isLoading: true));
+        await _authenticationRepository.signUp(
+            email: state.email.value, password: state.password.value);
+        emit(
+          state.copyWith(
+              status: FormzSubmissionStatus.success, isLoading: false),
+        );
+      } on SignUpWithEmailAndPasswordFailure catch (e) {
+        emit(
+          state.copyWith(
+              status: FormzSubmissionStatus.failure, errorMessage: e.message),
+        );
+      } catch (e) {
+        emit(
+          state.copyWith(status: FormzSubmissionStatus.failure),
+        );
+      }
     }
   }
 }

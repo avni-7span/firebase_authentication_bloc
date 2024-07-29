@@ -14,20 +14,17 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration(seconds: 3), () => context.pushRoute(LoginRoute()));
+    Future.delayed(const Duration(seconds: 2),
+        () => context.replaceRoute(const LoginRoute()));
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Splash Screen'),
-        backgroundColor: Colors.blueAccent,
-      ),
-      body: const Center(
+    return const Scaffold(
+      body: Center(
         child: Text(
           'Welcome',
-          style: TextStyle(color: Colors.orange, fontSize: 50),
+          style: TextStyle(color: Colors.cyan, fontSize: 50),
         ),
       ),
     );

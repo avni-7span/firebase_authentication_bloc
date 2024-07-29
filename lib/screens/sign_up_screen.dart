@@ -11,18 +11,24 @@ class SignUpScreen extends StatelessWidget implements AutoRouteWrapper {
   const SignUpScreen({super.key});
 
   @override
+  Widget wrappedRoute(BuildContext context) {
+    return BlocProvider(
+        create: (ctx) => SignUpCubit(AuthenticationRepository()), child: this);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Sign up Screen'),
         backgroundColor: Colors.blueAccent,
       ),
       body: BlocListener<SignUpCubit, SignUpState>(
         listenWhen: (previous, current) => previous.status != current.status,
         listener: (context, state) {
           if (state.status.isSuccess) {
-            context.pushRoute(const ProfileRoute());
-          } else if (state.status.isFailure) {
+            context.replaceRoute(const ProfileRoute());
+          }
+          if (state.status.isFailure) {
             ScaffoldMessenger.of(context)
               ..hideCurrentSnackBar
               ..showSnackBar(
@@ -36,41 +42,37 @@ class SignUpScreen extends StatelessWidget implements AutoRouteWrapper {
           child: SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.only(left: 20, right: 20),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text(
-                    'SignUp Now!',
-                    style: TextStyle(color: Colors.black, fontSize: 20),
-                  ),
-                  const SizedBox(height: 10),
-                  Image.asset(
-                    'assets/bloc_logo_small.png',
-                    height: 120,
-                  ),
-                  const SizedBox(height: 30),
-                  const _EmailField(),
-                  const SizedBox(height: 15),
-                  const _PasswordField(),
-                  const SizedBox(height: 15),
-                  const _ConfirmedPasswordField(),
-                  const SizedBox(height: 30),
-                  const _SignupButton(),
-                  const SizedBox(height: 15),
-                  const _LoginButton(),
-                ],
+              child: SafeArea(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      'SignUp Now!',
+                      style: TextStyle(color: Colors.black, fontSize: 20),
+                    ),
+                    const SizedBox(height: 10),
+                    Image.asset(
+                      'assets/bloc_logo_small.png',
+                      height: 120,
+                    ),
+                    const SizedBox(height: 30),
+                    const _EmailField(),
+                    const SizedBox(height: 15),
+                    const _PasswordField(),
+                    const SizedBox(height: 15),
+                    const _ConfirmedPasswordField(),
+                    const SizedBox(height: 30),
+                    const _SignupButton(),
+                    const SizedBox(height: 15),
+                    const _LoginButton(),
+                  ],
+                ),
               ),
             ),
           ),
         ),
       ),
     );
-  }
-
-  @override
-  Widget wrappedRoute(BuildContext context) {
-    return BlocProvider(
-        create: (ctx) => SignUpCubit(AuthenticationRepository()), child: this);
   }
 }
 
@@ -155,7 +157,7 @@ class _SignupButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<SignUpCubit, SignUpState>(
       builder: (context, state) {
-        return state.status.isInProgress
+        return state.status.isInProgress //|| state.isLoading
             ? const Center(
                 child: CircularProgressIndicator(),
               )
@@ -167,10 +169,11 @@ class _SignupButton extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20),
                   ),
                 ),
-                onPressed: () {
-                  state.isValid ? context.read<SignUpCubit>().onSignUp() : null;
-                },
-                child: const Text('SIGN UP'),
+                onPressed: context.read<SignUpCubit>().onSignUp,
+                child: const Text(
+                  'SIGN UP',
+                  style: TextStyle(color: Colors.black),
+                ),
               );
       },
     );
@@ -190,12 +193,11 @@ class _LoginButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
         ),
       ),
-      onPressed: () => context.pushRoute(const LoginRoute()),
+      onPressed: () => context.replaceRoute(const LoginRoute()),
       child: const Text(
         'LOGIN IN EXISTING ACCOUNT',
         style: TextStyle(color: Colors.black),
       ),
     );
-    ;
   }
 }

@@ -5,29 +5,49 @@ import 'package:firebasebloc/routes/router.gr.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 @RoutePage()
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  final instance = SharedPreferences.getInstance();
+  String email = '';
+
+  Future loadUserData() async {
+    final prefInstance = await instance;
+    setState(() {
+      email = prefInstance.getString('email') ?? '';
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    loadUserData();
+    // if (email.length > 1) {
+    //   context.pushRoute(const ProfileRoute());
+    // }
+  }
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => LoginCubit(AuthenticationRepository()),
-      // create:(_)=> LoginCubit(context.read<AuthenticationRepository>()),
       child: Scaffold(
         appBar: AppBar(
-          title: const Text(
-            'Welcome',
-            style: TextStyle(color: Colors.black),
-          ),
           backgroundColor: Colors.blueAccent,
         ),
         body: BlocListener<LoginCubit, LoginState>(
           listenWhen: (previous, current) => previous.status != current.status,
           listener: (context, state) {
             if (state.status.isSuccess) {
-              context.pushRoute(const ProfileRoute());
+              context.replaceRoute(const ProfileRoute());
             } else if (state.status.isFailure) {
               ScaffoldMessenger.of(context)
                 ..hideCurrentSnackBar
@@ -43,22 +63,43 @@ class LoginScreen extends StatelessWidget {
             child: SingleChildScrollView(
               child: Padding(
                 padding: const EdgeInsets.only(left: 20, right: 20),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset(
-                      'assets/bloc_logo_small.png',
-                      height: 120,
-                    ),
-                    const SizedBox(height: 30),
-                    const _EmailField(),
-                    const SizedBox(height: 15),
-                    const _PasswordField(),
-                    const SizedBox(height: 30),
-                    const _LoginButton(),
-                    const SizedBox(height: 15),
-                    const _SignupButton()
-                  ],
+                child: SafeArea(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        'assets/bloc_logo_small.png',
+                        height: 120,
+                      ),
+                      const SizedBox(height: 30),
+                      const _EmailField(),
+                      const SizedBox(height: 15),
+                      const _PasswordField(),
+                      const SizedBox(height: 30),
+                      BlocBuilder<LoginCubit, LoginState>(
+                        builder: (context, state) {
+                          return state.status.isInProgress
+                              ? const Center(child: CircularProgressIndicator())
+                              : ElevatedButton(
+                                  key: const Key('LoginScreen_loginButton'),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.cyan,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                  ),
+                                  onPressed: context.read<LoginCubit>().onLogin,
+                                  child: const Text(
+                                    'LOGIN',
+                                    style: TextStyle(color: Colors.black),
+                                  ),
+                                );
+                        },
+                      ),
+                      const SizedBox(height: 15),
+                      const _SignupButton()
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -116,35 +157,6 @@ class _PasswordField extends StatelessWidget {
   }
 }
 
-class _LoginButton extends StatelessWidget {
-  const _LoginButton({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<LoginCubit, LoginState>(
-      builder: (context, state) {
-        return state.status.isInProgress
-            ? const Center(child: CircularProgressIndicator())
-            : ElevatedButton(
-                key: const Key('LoginScreen_loginButton'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.cyan,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                ),
-                onPressed:
-                    state.isValid ? context.read<LoginCubit>().onLogin : null,
-                child: const Text(
-                  'LOGIN',
-                  style: TextStyle(color: Colors.black),
-                ),
-              );
-      },
-    );
-  }
-}
-
 class _SignupButton extends StatelessWidget {
   const _SignupButton({super.key});
 
@@ -158,7 +170,7 @@ class _SignupButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
         ),
       ),
-      onPressed: () => context.pushRoute(const SignUpRoute()),
+      onPressed: () => context.replaceRoute(const SignUpRoute()),
       child: const Text(
         'CREATE ACCOUNT',
         style: TextStyle(color: Colors.black),

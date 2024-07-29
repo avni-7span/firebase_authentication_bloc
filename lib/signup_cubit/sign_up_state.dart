@@ -7,7 +7,8 @@ class SignUpState extends Equatable {
       this.confirmedPassword = const ConfirmedPassword.pure(),
       this.status = FormzSubmissionStatus.initial,
       this.errorMessage,
-      this.isValid = false});
+      this.isValid = false,
+      this.isLoading = false});
 
   final Email email;
   final Password password;
@@ -15,26 +16,27 @@ class SignUpState extends Equatable {
   final String? errorMessage;
   final FormzSubmissionStatus status;
   final bool isValid;
+  final bool isLoading;
 
-  SignUpState copyWith({
-    Email? email,
-    Password? password,
-    ConfirmedPassword? confirmedPassword,
-    String? errorMessage,
-    FormzSubmissionStatus? status,
-    bool? isValid,
-  }) {
+  SignUpState copyWith(
+      {Email? email,
+      Password? password,
+      ConfirmedPassword? confirmedPassword,
+      String? errorMessage,
+      FormzSubmissionStatus? status,
+      bool? isValid,
+      bool? isLoading}) {
     return SignUpState(
-      email: email ?? this.email,
-      password: password ?? this.password,
-      confirmedPassword: confirmedPassword ?? this.confirmedPassword,
-      errorMessage: errorMessage ?? this.errorMessage,
-      status: status ?? this.status,
-      isValid: isValid ?? this.isValid,
-    );
+        email: email ?? this.email,
+        password: password ?? this.password,
+        confirmedPassword: confirmedPassword ?? this.confirmedPassword,
+        errorMessage: errorMessage ?? this.errorMessage,
+        status: status ?? this.status,
+        isValid: isValid ?? this.isValid,
+        isLoading: isLoading ?? this.isLoading);
   }
 
   @override
   List<Object?> get props =>
-      [email, password, confirmedPassword, errorMessage, isValid];
+      [email, password, confirmedPassword, errorMessage, isValid, isLoading];
 }

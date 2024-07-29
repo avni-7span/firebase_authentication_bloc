@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebasebloc/authentication_repository/authentication_repository.dart';
@@ -48,9 +49,11 @@ class LoginCubit extends Cubit<LoginState> {
         await _authenticationRepository.logInWithEmailAndPassword(
             email: state.email.value, password: state.password.value);
         emit(state.copyWith(status: FormzSubmissionStatus.success));
-      } on LogInWithEmailAndPasswordFailure catch (e) {
+      } on FirebaseAuthException catch (e) {
+        final errorMessage =
+            LogInWithEmailAndPasswordFailure.fromCode(e.code).message;
         emit(state.copyWith(
-            errorMessage: e.message, status: FormzSubmissionStatus.failure));
+            errorMessage: errorMessage, status: FormzSubmissionStatus.failure));
       }
     }
   }

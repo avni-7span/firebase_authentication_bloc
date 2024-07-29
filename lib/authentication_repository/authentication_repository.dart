@@ -63,6 +63,8 @@ class LogInWithEmailAndPasswordFailure implements Exception {
         return const LogInWithEmailAndPasswordFailure(
           'Incorrect password, please try again.',
         );
+      case 'invalid-credential':
+        return const LogInWithEmailAndPasswordFailure('Invalid Credential.');
       default:
         return const LogInWithEmailAndPasswordFailure();
     }
@@ -71,6 +73,7 @@ class LogInWithEmailAndPasswordFailure implements Exception {
 
 extension on firebase_auth.User {
   /// Maps a [firebase_auth.User] into a [User].
+
   User get toUser {
     return User(id: uid, email: email, name: displayName, photo: photoURL);
   }
@@ -113,25 +116,25 @@ class AuthenticationRepository {
     required String email,
     required String password,
   }) async {
-    try {
-      await _firebaseAuth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-    } on firebase_auth.FirebaseAuthException catch (e) {
-      throw LogInWithEmailAndPasswordFailure.fromCode(e.code);
-    } catch (_) {
-      throw const LogInWithEmailAndPasswordFailure();
-    }
+    await _firebaseAuth.signInWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
   }
 
+  // Future<void> logOut() async {
+  //   try {
+  //     await Future.wait([
+  //       _firebaseAuth.signOut(),
+  //     ]);
+  //   } catch (_) {
+  //     throw LogOutFailure();
+  //   }
+  // }
+
   Future<void> logOut() async {
-    try {
-      await Future.wait([
-        _firebaseAuth.signOut(),
-      ]);
-    } catch (_) {
-      throw LogOutFailure();
-    }
+    await Future.wait([
+      _firebaseAuth.signOut(),
+    ]);
   }
 }

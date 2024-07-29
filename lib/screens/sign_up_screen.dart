@@ -169,7 +169,11 @@ class _SignupButton extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20),
                   ),
                 ),
-                onPressed: context.read<SignUpCubit>().onSignUp,
+                onPressed: () {
+                  if (state.isValid) {
+                    context.read<SignUpCubit>().onSignUp();
+                  }
+                },
                 child: const Text(
                   'SIGN UP',
                   style: TextStyle(color: Colors.black),

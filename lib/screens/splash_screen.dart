@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:firebasebloc/authentication_repository/authentication_repository.dart';
 import 'package:firebasebloc/routes/router.gr.dart';
 import 'package:flutter/material.dart';
 
@@ -14,8 +15,13 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(seconds: 2),
-        () => context.replaceRoute(const LoginRoute()));
+    Future.delayed(
+        const Duration(seconds: 2),
+        () =>
+            // context.replaceRoute(const LoginRoute()));
+            AuthenticationRepository().currentUser != null
+                ? context.replaceRoute(const ProfileRoute())
+                : context.replaceRoute(const LoginRoute()));
   }
 
   @override

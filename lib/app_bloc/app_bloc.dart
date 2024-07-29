@@ -1,9 +1,8 @@
 import 'dart:async';
-import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebasebloc/authentication_repository/authentication_repository.dart';
 import 'package:firebasebloc/authentication_repository/user_model.dart';
-
+import 'package:flutter_bloc/flutter_bloc.dart';
 part 'app_event.dart';
 
 part 'app_state.dart';

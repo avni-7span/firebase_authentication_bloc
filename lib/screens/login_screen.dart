@@ -5,7 +5,6 @@ import 'package:firebasebloc/routes/router.gr.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 @RoutePage()
 class LoginScreen extends StatefulWidget {
@@ -16,25 +15,6 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final instance = SharedPreferences.getInstance();
-  String email = '';
-
-  Future loadUserData() async {
-    final prefInstance = await instance;
-    setState(() {
-      email = prefInstance.getString('email') ?? '';
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    loadUserData();
-    // if (email.length > 1) {
-    //   context.pushRoute(const ProfileRoute());
-    // }
-  }
-
   @override
   Widget build(BuildContext context) {
     return BlocProvider(

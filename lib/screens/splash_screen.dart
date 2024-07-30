@@ -15,13 +15,14 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(
-        const Duration(seconds: 2),
-        () =>
-            // context.replaceRoute(const LoginRoute()));
-            AuthenticationRepository().currentUser != null
-                ? context.replaceRoute(const ProfileRoute())
-                : context.replaceRoute(const LoginRoute()));
+    Future.delayed(const Duration(seconds: 2),
+        () => context.replaceRoute(const CreateProfileRoute()));
+    // AuthenticationRepository().currentUser != null
+    //     ? context.replaceRoute(const ProfileRoute())
+    //     : context.replaceRoute(
+    //         const LoginRoute(),
+    //       ),
+    // );
   }
 
   @override

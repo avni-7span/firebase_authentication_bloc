@@ -43,6 +43,8 @@ dependencies:
   cached: ^1.7.0
   formz: ^0.7.0
   shared_preferences: ^2.2.3
+  image_picker: ^1.1.2
+  cloud_firestore: ^5.1.0
 
 dev_dependencies:
   flutter_test:

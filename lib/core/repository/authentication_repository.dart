@@ -2,13 +2,13 @@ import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:firebasebloc/core/models/user_model.dart';
 import 'package:firebasebloc/core/repository/authentication_failure.dart';
 
-extension on firebase_auth.User {
-  /// Maps a [firebase_auth.User] into a [User].
-
-  User get toUser {
-    return User(id: uid, email: email, name: displayName, photo: photoURL);
-  }
-}
+// extension on firebase_auth.User {
+//   /// Maps a [firebase_auth.User] into a [User].
+//
+//   User get toUser {
+//     return User(id: uid, email: email, name: displayName, photo: photoURL);
+//   }
+// }
 
 class AuthenticationRepository {
   final firebase_auth.FirebaseAuth _firebaseAuth;
@@ -28,12 +28,12 @@ class AuthenticationRepository {
     return firebase_auth.FirebaseAuth.instance.currentUser;
   }
 
-  Stream<User> get user {
-    return _firebaseAuth.authStateChanges().map((firebaseUser) {
-      final user = firebaseUser == null ? User.empty : firebaseUser.toUser;
-      return user;
-    });
-  }
+  // Stream<User> get user {
+  //   return _firebaseAuth.authStateChanges().map((firebaseUser) {
+  //     final user = firebaseUser == null ? User.empty : firebaseUser.toUser;
+  //     return user;
+  //   });
+  // }
 
   Future<void> signUp({required String email, required String password}) async {
     try {
@@ -57,16 +57,6 @@ class AuthenticationRepository {
       password: password,
     );
   }
-
-  // Future<void> logOut() async {
-  //   try {
-  //     await Future.wait([
-  //       _firebaseAuth.signOut(),
-  //     ]);
-  //   } catch (_) {
-  //     throw LogOutFailure();
-  //   }
-  // }
 
   Future<void> logOut() async {
     await Future.wait([

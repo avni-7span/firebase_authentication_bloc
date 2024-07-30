@@ -150,7 +150,7 @@ class _SignupButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
         ),
       ),
-      onPressed: () => context.replaceRoute(const SignUpRoute()),
+      onPressed: () => context.replaceRoute(const CreateProfileRoute()),
       child: const Text(
         'CREATE ACCOUNT',
         style: TextStyle(color: Colors.black),

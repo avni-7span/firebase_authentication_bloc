@@ -1,5 +1,5 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:firebasebloc/authentication_repository/authentication_repository.dart';
+import 'package:firebasebloc/core/repository/authentication_repository.dart';
 import 'package:firebasebloc/routes/router.gr.dart';
 import 'package:flutter/material.dart';
 

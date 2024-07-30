@@ -9,9 +9,9 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:auto_route/auto_route.dart' as _i5;
-import 'package:firebasebloc/screens/login_screen.dart' as _i1;
+import 'package:firebasebloc/modules/login/screens/login_screen.dart' as _i1;
 import 'package:firebasebloc/screens/profile_screen.dart' as _i2;
-import 'package:firebasebloc/screens/sign_up_screen.dart' as _i3;
+import 'package:firebasebloc/modules/signup/screens/sign_up_screen.dart' as _i3;
 import 'package:firebasebloc/screens/splash_screen.dart' as _i4;
 
 abstract class $AppRoute extends _i5.RootStackRouter {

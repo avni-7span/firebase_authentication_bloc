@@ -1,5 +1,5 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:firebasebloc/logout-cubit/log_out_cubit.dart';
+import 'package:firebasebloc/modules/logout/cubit/log_out_cubit.dart';
 import 'package:firebasebloc/routes/router.gr.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -13,7 +13,10 @@ class ProfileScreen extends StatefulWidget implements AutoRouteWrapper {
 
   @override
   Widget wrappedRoute(BuildContext context) {
-    return BlocProvider(create: (ctx) => LogOutCubit(), child: this);
+    return BlocProvider(
+      create: (context) => LogOutCubit(),
+      child: this,
+    );
   }
 }
 

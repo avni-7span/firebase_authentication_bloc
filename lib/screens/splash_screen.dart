@@ -35,7 +35,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   void checkNavigation() {
     RepositoryProvider.of<AuthenticationRepository>(context).currentUser != null
-        ? context.replaceRoute(const ProfileRoute())
+        ? context.replaceRoute(const UserHomeRoute())
         : context.replaceRoute(const LoginRoute());
   }
 }

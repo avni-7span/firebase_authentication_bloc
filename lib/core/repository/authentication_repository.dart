@@ -1,5 +1,4 @@
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
-import 'package:firebasebloc/core/models/user_model.dart';
 import 'package:firebasebloc/core/repository/authentication_failure.dart';
 
 // extension on firebase_auth.User {

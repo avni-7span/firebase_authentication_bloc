@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 
 /// [User.empty] represents an unauthenticated user.
@@ -12,6 +13,7 @@ class User extends Equatable {
   static const empty = User(id: '');
 
   bool get isEmpty => this == User.empty;
+
   bool get isNotEmpty => this != User.empty;
 
   @override
@@ -23,5 +25,13 @@ class User extends Equatable {
       if (id != null) "id": id,
       if (phoneNumber != null) "phoneNumber": phoneNumber,
     };
+  }
+
+  factory User.fromFireStore(DocumentSnapshot<Map<String, dynamic>> snapshot) {
+    final data = snapshot.data();
+    return User(
+        id: data?['id'],
+        email: data?['email'],
+        phoneNumber: data?['Phone number']);
   }
 }

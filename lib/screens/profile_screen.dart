@@ -42,16 +42,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
           }
         },
         child: Center(
-          child: SizedBox(
-            height: 80,
-            width: 100,
-            child: FloatingActionButton(
-              onPressed: context.read<LogOutCubit>().logOut,
-              child: const Text(
-                'Log Out',
-                style: TextStyle(color: Colors.black),
+          child: Column(
+            children: [
+              SizedBox(
+                height: 80,
+                width: 100,
+                child: FloatingActionButton(
+                  onPressed: context.read<LogOutCubit>().logOut,
+                  child: const Text(
+                    'Log Out',
+                    style: TextStyle(color: Colors.black),
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
         ),
       ),

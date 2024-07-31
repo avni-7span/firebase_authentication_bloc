@@ -26,7 +26,7 @@ class SignUpScreen extends StatelessWidget implements AutoRouteWrapper {
         listenWhen: (previous, current) => previous.status != current.status,
         listener: (context, state) {
           if (state.status.isSuccess) {
-            context.replaceRoute(const ProfileRoute());
+            context.replaceRoute(const CreateProfileRoute());
           }
           if (state.status.isFailure) {
             ScaffoldMessenger.of(context)

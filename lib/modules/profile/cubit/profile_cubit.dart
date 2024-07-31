@@ -1,7 +1,9 @@
+import 'dart:io';
+
 import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
-import 'package:firebasebloc/core/models/user_model.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebasebloc/core/repository/authentication_repository.dart';
 import 'package:firebasebloc/core/validators/phoneNumber.dart';
 import 'package:formz/formz.dart';
@@ -13,6 +15,7 @@ class ProfileCubit extends Cubit<ProfileState> {
   ProfileCubit() : super(const ProfileState());
 
   final db = FirebaseFirestore.instance;
+  final storageReference = FirebaseStorage.instance.ref().child('Profile_Pics');
   final authInstance = AuthenticationRepository();
 
   Future<void> getImageFromGallery() async {
@@ -48,12 +51,8 @@ class ProfileCubit extends Cubit<ProfileState> {
     if (state.isValid && state.profileImage != null) {
       //print('ready to store data');
       try {
-        emit(state.copyWith(isLoading: true));
-        await addUserInfoInFireStore(
-            authInstance.currentUser?.uid ?? '',
-            state.profileImage!,
-            authInstance.currentUser?.email!,
-            state.phoneNumber.value);
+        emit(state.copyWith(isLoading: true, imageError: false));
+        await addUserPhoneNumber(state.phoneNumber.value);
         emit(state.copyWith(
             isLoading: false, status: FormzSubmissionStatus.success));
       } catch (e) {
@@ -63,18 +62,15 @@ class ProfileCubit extends Cubit<ProfileState> {
         );
       }
     }
-    // final user = User(
-    //   photo: state.profileImage,
-    //   id: authInstance.currentUser?.uid ?? '',
-    //   email: authInstance.currentUser?.email,
-    //   phoneNumber: state.phoneNumber.value,
-    // );
   }
 
-  Future addUserInfoInFireStore(
-      String id, XFile photo, String? email, String phoneNumber) async {
-    final user =
-        User(id: id, email: email, phoneNumber: phoneNumber, photo: photo);
-    await db.collection('Users').add(User(id: id).toFireStore());
+  Future<void> addUserPhoneNumber(String phoneNumber) async {
+    await storageReference.child(authInstance.currentUser!.uid).putFile(
+          File(state.profileImage!.path),
+        );
+    await db
+        .collection('users')
+        .doc(authInstance.currentUser!.uid)
+        .update({'Phone number': phoneNumber});
   }
 }

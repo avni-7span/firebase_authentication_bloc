@@ -2,8 +2,10 @@ import 'dart:io';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:firebasebloc/modules/profile/cubit/profile_cubit.dart';
+import 'package:firebasebloc/routes/router.gr.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:formz/formz.dart';
 
 @RoutePage()
 class CreateProfileScreen extends StatefulWidget implements AutoRouteWrapper {
@@ -29,89 +31,89 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
         backgroundColor: Colors.blueAccent,
       ),
       body: BlocListener<ProfileCubit, ProfileState>(
-        listenWhen: (previous, current) =>
-            previous.imageError != current.imageError,
+        listenWhen: (previous, current) => previous.status != current.status,
         listener: (context, state) {
-          print('listen thayu');
-          if (state.imageError) {
-            AlertDialog(
-              content: const Text('Please select a profile picture.'),
-              actions: <Widget>[
-                TextButton(
-                  child: const Text('Ok'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
-            );
+          if (state.status.isFailure) {
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                content: Text('Something went wrong, please try again later')));
           }
+          if (state.status.isSuccess) {
+            context.replaceRoute(const UserHomeRoute());
+          }
+          // if (state.imageError) {
+          //   AlertDialog(
+          //     content: const Text('Please select a profile picture.'),
+          //     actions: <Widget>[
+          //       TextButton(
+          //         child: const Text('Ok'),
+          //         onPressed: () {
+          //           Navigator.of(context).pop();
+          //         },
+          //       ),
+          //     ],
+          //   );
+          // }
         },
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                'Let\'s finish up creating your profile',
+                style: TextStyle(fontSize: 20),
+              ),
+              const SizedBox(height: 40),
+              Stack(
                 children: [
-                  const Text(
-                    'Let\'s finish up creating your profile',
-                    style: TextStyle(fontSize: 20),
+                  CircleAvatar(
+                    radius: 78,
+                    backgroundColor: Colors.blueAccent,
+                    child: BlocBuilder<ProfileCubit, ProfileState>(
+                      buildWhen: (previous, current) =>
+                          previous.profileImage != current.profileImage,
+                      builder: (context, state) {
+                        return state.isLoading
+                            ? const CircularProgressIndicator()
+                            : CircleAvatar(
+                                radius: 75,
+                                backgroundImage: state.profileImage != null
+                                    ? FileImage(File(state.profileImage!.path))
+                                    : const AssetImage(
+                                        'assets/fake_user_profile.webp'),
+                              );
+                      },
+                    ),
                   ),
-                  const SizedBox(height: 40),
-                  Stack(
-                    children: [
-                      CircleAvatar(
-                        radius: 78,
-                        backgroundColor: Colors.blueAccent,
-                        child: BlocBuilder<ProfileCubit, ProfileState>(
-                          buildWhen: (previous, current) =>
-                              previous.profileImage != current.profileImage,
-                          builder: (context, state) {
-                            return state.isLoading
-                                ? const CircularProgressIndicator()
-                                : CircleAvatar(
-                                    radius: 75,
-                                    backgroundImage: state.profileImage != null
-                                        ? FileImage(
-                                            File(state.profileImage!.path))
-                                        : const AssetImage(
-                                            'assets/fake_user_profile.webp'),
-                                  );
-                          },
+                  Positioned(
+                    bottom: 10,
+                    right: 8,
+                    child: InkWell(
+                      onTap: context.read<ProfileCubit>().getImageFromGallery,
+                      child: Container(
+                        width: 42,
+                        height: 42,
+                        decoration: const BoxDecoration(
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(20),
+                          ),
+                          color: Colors.blueAccent,
+                        ),
+                        child: const Icon(
+                          Icons.add_a_photo_outlined,
+                          color: Colors.white,
+                          size: 30,
                         ),
                       ),
-                      InkWell(
-                        onTap: context.read<ProfileCubit>().getImageFromGallery,
-                        child: Positioned(
-                          bottom: 10,
-                          right: 8,
-                          child: Container(
-                            width: 42,
-                            height: 42,
-                            decoration: const BoxDecoration(
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(20),
-                              ),
-                              color: Colors.blueAccent,
-                            ),
-                            child: const Icon(
-                              Icons.add_a_photo_outlined,
-                              color: Colors.white,
-                              size: 30,
-                            ),
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                  const SizedBox(height: 40),
-                  const PhoneNumberField(),
-                  const SizedBox(height: 40),
-                  const CreateProfileButton(),
+                    ),
+                  )
                 ],
               ),
-            ),
+              const SizedBox(height: 40),
+              const PhoneNumberField(),
+              const SizedBox(height: 40),
+              const CreateProfileButton(),
+            ],
           ),
         ),
       ),

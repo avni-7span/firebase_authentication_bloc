@@ -13,7 +13,9 @@ class LoginScreen extends StatefulWidget implements AutoRouteWrapper {
   @override
   Widget wrappedRoute(BuildContext context) {
     return BlocProvider(
-      create: (context) => LoginCubit(AuthenticationRepository()),
+      create: (context) => LoginCubit(
+        RepositoryProvider.of<AuthenticationRepository>(context),
+      ),
       child: this,
     );
   }
@@ -31,7 +33,7 @@ class _LoginScreenState extends State<LoginScreen> {
         listenWhen: (previous, current) => previous.status != current.status,
         listener: (context, state) {
           if (state.status.isSuccess) {
-            context.replaceRoute(const ProfileRoute());
+            context.replaceRoute(const UserHomeRoute());
           } else if (state.status.isFailure) {
             ScaffoldMessenger.of(context)
               ..hideCurrentSnackBar
@@ -42,48 +44,41 @@ class _LoginScreenState extends State<LoginScreen> {
               );
           }
         },
-        child: Center(
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.only(left: 20, right: 20),
-              child: SafeArea(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset(
-                      'assets/bloc_logo_small.png',
-                      height: 120,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.only(left: 20, right: 20),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset('assets/bloc_logo_small.png', height: 120),
+              const SizedBox(height: 30),
+              const _EmailField(),
+              const SizedBox(height: 15),
+              const _PasswordField(),
+              const SizedBox(height: 30),
+              BlocBuilder<LoginCubit, LoginState>(
+                builder: (context, state) {
+                  return ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.cyan,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
                     ),
-                    const SizedBox(height: 30),
-                    const _EmailField(),
-                    const SizedBox(height: 15),
-                    const _PasswordField(),
-                    const SizedBox(height: 30),
-                    BlocBuilder<LoginCubit, LoginState>(
-                      builder: (context, state) {
-                        return state.status.isInProgress
-                            ? const Center(child: CircularProgressIndicator())
-                            : ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.cyan,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                ),
-                                onPressed: context.read<LoginCubit>().onLogin,
-                                child: const Text(
-                                  'LOGIN',
-                                  style: TextStyle(color: Colors.black),
-                                ),
-                              );
-                      },
-                    ),
-                    const SizedBox(height: 15),
-                    const _SignupButton()
-                  ],
-                ),
+                    onPressed: state.status.isInProgress
+                        ? null
+                        : context.read<LoginCubit>().onLoginTap,
+                    child: state.status.isInProgress
+                        ? const Center(child: CircularProgressIndicator())
+                        : const Text(
+                            'LOGIN',
+                            style: TextStyle(color: Colors.black),
+                          ),
+                  );
+                },
               ),
-            ),
+              const SizedBox(height: 15),
+              const _SignupButton(),
+            ],
           ),
         ),
       ),
@@ -150,7 +145,7 @@ class _SignupButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
         ),
       ),
-      onPressed: () => context.replaceRoute(const CreateProfileRoute()),
+      onPressed: () => context.replaceRoute(const SignUpRoute()),
       child: const Text(
         'CREATE ACCOUNT',
         style: TextStyle(color: Colors.black),

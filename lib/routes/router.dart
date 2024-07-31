@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:firebasebloc/modules/user_home/screens/user_home_screen.dart';
 import 'package:firebasebloc/routes/router.gr.dart';
 
 @AutoRouterConfig(replaceInRouteName: 'Screen,Route')
@@ -11,7 +12,8 @@ class AppRoute extends $AppRoute {
     AutoRoute(page: SignUpRoute.page),
     AutoRoute(page: LoginRoute.page),
     AutoRoute(page: ProfileRoute.page),
-    AutoRoute(page: CreateProfileRoute.page)
+    AutoRoute(page: CreateProfileRoute.page),
+    AutoRoute(page: UserHomeRoute.page)
   ];
 }
 

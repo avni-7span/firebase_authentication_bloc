@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebasebloc/core/repository/authentication_repository.dart';
+import 'package:firebasebloc/firebase_options.dart';
 import 'package:firebasebloc/modules/app_bloc/app_bloc.dart';
 import 'package:firebasebloc/routes/router.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform
       // options: const FirebaseOptions(
       //   apiKey: 'AIzaSyCpznQFFmVp3w9rxw8Lw32eEJUYRUxq7DY',
       //   appId: "1:535095414450:web:126aef2e60d05dbad703ab",

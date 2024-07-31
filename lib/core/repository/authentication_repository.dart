@@ -22,6 +22,7 @@ class AuthenticationRepository {
 
   AuthenticationRepository._internal()
       : _firebaseAuth = firebase_auth.FirebaseAuth.instance;
+
   // static const userCacheKey = '__user_cache_key__';
 
   firebase_auth.User? get currentUser {
@@ -35,12 +36,17 @@ class AuthenticationRepository {
   //   });
   // }
 
-  Future<void> signUp({required String email, required String password}) async {
+  Future<firebase_auth.UserCredential> signUp({
+    required String email,
+    required String password,
+  }) async {
     try {
-      await _firebaseAuth.createUserWithEmailAndPassword(
+      firebase_auth.UserCredential cred =
+          await _firebaseAuth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
+      return cred;
     } on firebase_auth.FirebaseAuthException catch (e) {
       throw SignUpWithEmailAndPasswordFailure.fromCode(e.code);
     } catch (_) {
@@ -48,19 +54,19 @@ class AuthenticationRepository {
     }
   }
 
-  Future<void> logInWithEmailAndPassword({
+  Future<firebase_auth.UserCredential> logInWithEmailAndPassword({
     required String email,
     required String password,
   }) async {
-    await _firebaseAuth.signInWithEmailAndPassword(
+    final user = await _firebaseAuth.signInWithEmailAndPassword(
       email: email,
       password: password,
     );
+
+    return user;
   }
 
   Future<void> logOut() async {
-    await Future.wait([
-      _firebaseAuth.signOut(),
-    ]);
+    await _firebaseAuth.signOut();
   }
 }

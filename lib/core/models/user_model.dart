@@ -4,11 +4,12 @@ import 'package:equatable/equatable.dart';
 /// [User.empty] represents an unauthenticated user.
 
 class User extends Equatable {
-  const User({required this.id, this.email, this.phoneNumber});
+  const User({required this.id, this.email, this.phoneNumber, this.imageURL});
 
   final String? email;
   final String? id;
   final String? phoneNumber;
+  final String? imageURL;
 
   static const empty = User(id: '');
 
@@ -17,13 +18,14 @@ class User extends Equatable {
   bool get isNotEmpty => this != User.empty;
 
   @override
-  List<Object?> get props => [email, id, phoneNumber];
+  List<Object?> get props => [email, id, phoneNumber, imageURL];
 
   Map<String, dynamic> toFireStore() {
     return {
       if (email != null) "email": email,
       if (id != null) "id": id,
       if (phoneNumber != null) "phoneNumber": phoneNumber,
+      if (imageURL != null) 'imageURL': imageURL
     };
   }
 
@@ -32,6 +34,7 @@ class User extends Equatable {
     return User(
         id: data?['id'],
         email: data?['email'],
-        phoneNumber: data?['Phone number']);
+        phoneNumber: data?['phone number'],
+        imageURL: data?['image url']);
   }
 }

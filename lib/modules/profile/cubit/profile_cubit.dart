@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebasebloc/core/repository/authentication_repository.dart';
-import 'package:firebasebloc/core/validators/phoneNumber.dart';
+import 'package:firebasebloc/core/validators/phone_number.dart';
 import 'package:formz/formz.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -41,6 +41,7 @@ class ProfileCubit extends Cubit<ProfileState> {
   }
 
   Future<void> onProfileCreate() async {
+    emit(state.copyWith(status: ProfileStateStatus.createLoading));
     final phoneNumber = PhoneNumber.dirty(state.phoneNumber.value);
     emit(
       state.copyWith(
@@ -60,7 +61,7 @@ class ProfileCubit extends Cubit<ProfileState> {
       try {
         emit(state.copyWith(status: ProfileStateStatus.loading));
 
-        await addUserPhoneNumber(state.phoneNumber.value);
+        await addUserNumberAndImageUrl(state.phoneNumber.value);
         emit(
           state.copyWith(
             status: ProfileStateStatus.loaded,
@@ -77,13 +78,16 @@ class ProfileCubit extends Cubit<ProfileState> {
     }
   }
 
-  Future<void> addUserPhoneNumber(String phoneNumber) async {
+  Future<void> addUserNumberAndImageUrl(String phoneNumber) async {
     await storageReference.child(authInstance.currentUser!.uid).putFile(
           File(state.profileImage!.path),
         );
+    final userImageURL = await storageReference
+        .child(authInstance.currentUser!.uid)
+        .getDownloadURL();
     await db
         .collection('users')
         .doc(authInstance.currentUser!.uid)
-        .update({'Phone number': phoneNumber});
+        .update({'phone number': phoneNumber, 'image url': userImageURL});
   }
 }

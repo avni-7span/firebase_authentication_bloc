@@ -13,11 +13,7 @@ class UserHomeScreen extends StatefulWidget implements AutoRouteWrapper {
   Widget wrappedRoute(BuildContext context) {
     return MultiBlocProvider(providers: [
       BlocProvider(create: (context) => LogOutCubit()),
-      BlocProvider(
-        create: (context) => HomeCubit()
-          ..getUserCredentials()
-          ..getImageUrl(),
-      )
+      BlocProvider(create: (context) => HomeCubit()..getUserDetails())
     ], child: this);
   }
 
@@ -36,9 +32,9 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
           backgroundColor: Colors.blue,
         ),
         body: BlocListener<HomeCubit, HomeState>(
+          listenWhen: (previous, current) => previous.status != current.status,
           listener: (context, state) {
-            if (state.status == HomeStateStatus.userLoading ||
-                state.status == HomeStateStatus.imageLoading) {
+            if (state.status == HomeStateStatus.loading) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                   content: Text('Wait a moment...'),
@@ -47,7 +43,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
             } else if (state.status == HomeStateStatus.failure) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Could not fetch '),
+                  content: Text('Something went wrong,Please try again later'),
                 ),
               );
             }
@@ -65,16 +61,16 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                   children: [
                     Expanded(
                       flex: 1,
-                      child: CircleAvatar(
-                          radius: 75,
-                          backgroundImage:
-                              state.status == HomeStateStatus.imageLoading
-                                  ? const AssetImage(
-                                      'assets/fake_user_profile.webp')
-                                  : state.status == HomeStateStatus.userLoaded
-                                      ? NetworkImage(state.userImageUrl!)
-                                      : const AssetImage(
-                                          'assets/fake_user_profile.webp')),
+                      child: state.status == HomeStateStatus.loading
+                          ? const SizedBox.square(
+                              child: CircularProgressIndicator())
+                          : CircleAvatar(
+                              radius: 75,
+                              backgroundImage:
+                                  state.status == HomeStateStatus.loaded
+                                      ? NetworkImage(
+                                          state.user.imageURL ?? profileFake)
+                                      : const NetworkImage(profileFake)),
                     ),
                     Expanded(
                       flex: 2,
@@ -90,11 +86,11 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                               ),
                               const SizedBox(width: 20),
                               Text(
-                                state.status == HomeStateStatus.userLoading
-                                    ? '_____@gmail.com'
-                                    : state.status == HomeStateStatus.userLoaded
+                                state.status == HomeStateStatus.loading
+                                    ? 'Loading...'
+                                    : state.status == HomeStateStatus.loaded
                                         ? state.user.email!
-                                        : '',
+                                        : '_____@gmail.com',
                                 overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(
                                     fontSize: 17, color: Colors.white),
@@ -109,9 +105,9 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                               ),
                               const SizedBox(width: 20),
                               Text(
-                                state.status == HomeStateStatus.userLoading
-                                    ? 'xxxxxxxxxx'
-                                    : state.status == HomeStateStatus.userLoaded
+                                state.status == HomeStateStatus.loading
+                                    ? 'Loading...'
+                                    : state.status == HomeStateStatus.loaded
                                         ? state.user.phoneNumber!
                                         : 'xxxxxxxxxx',
                                 overflow: TextOverflow.ellipsis,
@@ -141,15 +137,29 @@ class LogOutButton extends StatelessWidget {
     return BlocListener<LogOutCubit, LogOutState>(
       listener: (context, state) {
         if (state.isLoading) {
-          ScaffoldMessenger.of(context)
-              .showSnackBar(const SnackBar(content: Text('Wait a moment..')));
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Wait a moment..'),
+            ),
+          );
           const Center(
             child: CircularProgressIndicator(),
           );
+          return;
         }
         if (state.logOutDone) {
           ScaffoldMessenger.of(context).hideCurrentSnackBar();
           context.replaceRoute(const LoginRoute());
+          return;
+        }
+        if (state.errorMessage != null) {
+          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Something went wrong'),
+            ),
+          );
+          return;
         }
       },
       child: FloatingActionButton.extended(

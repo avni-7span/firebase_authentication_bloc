@@ -2,6 +2,7 @@ part of 'profile_cubit.dart';
 
 enum ProfileStateStatus {
   initial,
+  createLoading,
   loading,
   loaded,
   imagePickerLoading,
@@ -14,7 +15,7 @@ class ProfileState extends Equatable {
   const ProfileState({
     this.profileImage,
     this.phoneNumber = const PhoneNumber.pure(),
-    this.isValid = false,
+    this.isValid = true,
     this.status = ProfileStateStatus.initial,
     this.error,
   });

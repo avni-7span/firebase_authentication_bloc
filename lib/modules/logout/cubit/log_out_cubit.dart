@@ -12,6 +12,8 @@ class LogOutCubit extends Cubit<LogOutState> {
     try {
       AuthenticationRepository().logOut();
       emit(state.copyWith(isLoading: false, logOutDone: true));
-    } catch (e) {}
+    } catch (e) {
+      emit(state.copyWith(errorMessage: 'Something went wrong'));
+    }
   }
 }

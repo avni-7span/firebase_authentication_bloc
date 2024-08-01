@@ -1,6 +1,5 @@
 import 'dart:io';
-
-import 'package:bloc/bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -19,16 +18,19 @@ class ProfileCubit extends Cubit<ProfileState> {
   final authInstance = AuthenticationRepository();
 
   Future<void> getImageFromGallery() async {
-    emit(
-      state.copyWith(isLoading: true),
-    );
+    emit(state.copyWith(status: ProfileStateStatus.imagePickerLoading));
+
     XFile? image = await ImagePicker().pickImage(source: ImageSource.gallery);
+
     emit(
-      state.copyWith(isLoading: false, profileImage: image),
+      state.copyWith(
+        profileImage: image,
+        status: ProfileStateStatus.imagePickerLoaded,
+      ),
     );
   }
 
-  void numberChanged(String value) {
+  void onNumberChange(String value) {
     final number = PhoneNumber.dirty(value);
     emit(
       state.copyWith(
@@ -38,7 +40,7 @@ class ProfileCubit extends Cubit<ProfileState> {
     );
   }
 
-  Future<void> onCreatingProfile() async {
+  Future<void> onProfileCreate() async {
     final phoneNumber = PhoneNumber.dirty(state.phoneNumber.value);
     emit(
       state.copyWith(
@@ -46,19 +48,30 @@ class ProfileCubit extends Cubit<ProfileState> {
       ),
     );
     if (state.profileImage == null) {
-      emit(state.copyWith(imageError: true));
+      emit(
+        state.copyWith(
+          status: ProfileStateStatus.imageIsNull,
+          // isValid: false,
+        ),
+      );
+      return;
     }
-    if (state.isValid && state.profileImage != null) {
-      //print('ready to store data');
+    if (state.isValid && state.status != ProfileStateStatus.imageIsNull) {
       try {
-        emit(state.copyWith(isLoading: true, imageError: false));
+        emit(state.copyWith(status: ProfileStateStatus.loading));
+
         await addUserPhoneNumber(state.phoneNumber.value);
-        emit(state.copyWith(
-            isLoading: false, status: FormzSubmissionStatus.success));
+        emit(
+          state.copyWith(
+            status: ProfileStateStatus.loaded,
+          ),
+        );
       } catch (e) {
         emit(
           state.copyWith(
-              error: e.toString(), status: FormzSubmissionStatus.failure),
+            error: e.toString(),
+            status: ProfileStateStatus.failure,
+          ),
         );
       }
     }

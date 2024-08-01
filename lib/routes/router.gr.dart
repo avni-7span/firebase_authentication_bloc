@@ -56,7 +56,7 @@ abstract class $AppRoute extends _i7.RootStackRouter {
     UserHomeRoute.name: (routeData) {
       return _i7.AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: const _i6.UserHomeScreen(),
+        child: _i7.WrappedRoute(child: const _i6.UserHomeScreen()),
       );
     },
   };

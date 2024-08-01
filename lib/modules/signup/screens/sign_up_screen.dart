@@ -88,18 +88,26 @@ class _EmailField extends StatelessWidget {
           key: const Key('SignUpScreen_email'),
           onChanged: (value) => context.read<SignUpCubit>().emailChanged(value),
           decoration: InputDecoration(
-              border: const OutlineInputBorder(),
-              labelText: 'Email',
-              errorText:
-                  state.email.displayError != null ? 'Invalid Email' : null),
+            border: const OutlineInputBorder(),
+            labelText: 'Email',
+            errorText:
+                state.email.displayError != null ? 'Invalid Email' : null,
+          ),
         );
       },
     );
   }
 }
 
-class _PasswordField extends StatelessWidget {
+class _PasswordField extends StatefulWidget {
   const _PasswordField({super.key});
+
+  @override
+  State<_PasswordField> createState() => _PasswordFieldState();
+}
+
+class _PasswordFieldState extends State<_PasswordField> {
+  bool isVisible = true;
 
   @override
   Widget build(BuildContext context) {
@@ -108,23 +116,42 @@ class _PasswordField extends StatelessWidget {
       builder: (context, state) {
         return TextFormField(
           key: const Key('SignUpScreen_password'),
-          obscureText: true,
+          obscureText: isVisible,
           onChanged: (value) =>
               context.read<SignUpCubit>().passwordChanged(value),
           decoration: InputDecoration(
-              border: const OutlineInputBorder(),
-              labelText: 'Password',
-              errorText: state.password.displayError != null
-                  ? 'Password must contain small, capital letters and numbers'
-                  : null),
+            border: const OutlineInputBorder(),
+            labelText: 'Password',
+            errorText: state.password.displayError != null
+                ? 'Password must contain small, capital letters and numbers'
+                : null,
+            suffixIcon: IconButton(
+              icon: isVisible
+                  ? const Icon(Icons.visibility)
+                  : const Icon(Icons.visibility_off),
+              onPressed: () {
+                setState(() {
+                  isVisible = !isVisible;
+                });
+              },
+            ),
+          ),
         );
       },
     );
   }
 }
 
-class _ConfirmedPasswordField extends StatelessWidget {
+class _ConfirmedPasswordField extends StatefulWidget {
   const _ConfirmedPasswordField({super.key});
+
+  @override
+  State<_ConfirmedPasswordField> createState() =>
+      _ConfirmedPasswordFieldState();
+}
+
+class _ConfirmedPasswordFieldState extends State<_ConfirmedPasswordField> {
+  bool isVisible = true;
 
   @override
   Widget build(BuildContext context) {
@@ -135,15 +162,26 @@ class _ConfirmedPasswordField extends StatelessWidget {
       builder: (context, state) {
         return TextFormField(
           key: const Key('SignUpScreen_confirmed_password'),
-          obscureText: true,
+          obscureText: isVisible,
           onChanged: (value) =>
               context.read<SignUpCubit>().confirmedPasswordChanged(value),
           decoration: InputDecoration(
-              border: const OutlineInputBorder(),
-              labelText: 'Confirm Password',
-              errorText: state.confirmedPassword.displayError != null
-                  ? 'Password do not match'
-                  : null),
+            border: const OutlineInputBorder(),
+            labelText: 'Confirm Password',
+            errorText: state.confirmedPassword.displayError != null
+                ? 'Password do not match'
+                : null,
+            suffixIcon: IconButton(
+              icon: isVisible
+                  ? const Icon(Icons.visibility)
+                  : const Icon(Icons.visibility_off),
+              onPressed: () {
+                setState(() {
+                  isVisible = !isVisible;
+                });
+              },
+            ),
+          ),
         );
       },
     );
@@ -157,10 +195,8 @@ class _SignupButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<SignUpCubit, SignUpState>(
       builder: (context, state) {
-        return state.status.isInProgress //|| state.isLoading
-            ? const Center(
-                child: CircularProgressIndicator(),
-              )
+        return state.status.isInProgress
+            ? const Center(child: CircularProgressIndicator())
             : ElevatedButton(
                 key: const Key('SignUp_screen_signup_button'),
                 style: ElevatedButton.styleFrom(
@@ -168,13 +204,12 @@ class _SignupButton extends StatelessWidget {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
                   ),
+                  // minimumSize: Size(
+                  //   MediaQuery.sizeOf(context).width * 0.8,
+                  //   50,
+                  // ),
                 ),
                 onPressed: context.read<SignUpCubit>().onSignUp,
-                //     () {
-                //   if (state.isValid) {
-                //     context.read<SignUpCubit>().onSignUp();
-                //   }
-                // },
                 child: const Text(
                   'SIGN UP',
                   style: TextStyle(color: Colors.black),

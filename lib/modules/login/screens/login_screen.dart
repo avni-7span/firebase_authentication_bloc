@@ -57,23 +57,23 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 30),
               BlocBuilder<LoginCubit, LoginState>(
                 builder: (context, state) {
-                  return ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.cyan,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                    ),
-                    onPressed: state.status.isInProgress
-                        ? null
-                        : context.read<LoginCubit>().onLoginTap,
-                    child: state.status.isInProgress
-                        ? const Center(child: CircularProgressIndicator())
-                        : const Text(
+                  return state.status.isInProgress
+                      ? const Center(child: CircularProgressIndicator())
+                      : ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.cyan,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                          ),
+                          onPressed: state.status.isInProgress
+                              ? null
+                              : context.read<LoginCubit>().onLoginTap,
+                          child: const Text(
                             'LOGIN',
                             style: TextStyle(color: Colors.black),
                           ),
-                  );
+                        );
                 },
               ),
               const SizedBox(height: 15),
@@ -108,8 +108,15 @@ class _EmailField extends StatelessWidget {
   }
 }
 
-class _PasswordField extends StatelessWidget {
+class _PasswordField extends StatefulWidget {
   const _PasswordField({super.key});
+
+  @override
+  State<_PasswordField> createState() => _PasswordFieldState();
+}
+
+class _PasswordFieldState extends State<_PasswordField> {
+  bool isVisible = true;
 
   @override
   Widget build(BuildContext context) {
@@ -117,7 +124,7 @@ class _PasswordField extends StatelessWidget {
       buildWhen: (previous, current) => previous.password != current.password,
       builder: (context, state) {
         return TextFormField(
-          obscureText: true,
+          obscureText: isVisible,
           onChanged: (value) =>
               context.read<LoginCubit>().passwordChanged(value),
           decoration: InputDecoration(
@@ -126,6 +133,16 @@ class _PasswordField extends StatelessWidget {
             errorText: state.password.displayError != null
                 ? 'Password must be 8 character long with upper,lower case,special character,number'
                 : null,
+            suffixIcon: IconButton(
+              icon: isVisible
+                  ? const Icon(Icons.visibility)
+                  : const Icon(Icons.visibility_off),
+              onPressed: () {
+                setState(() {
+                  isVisible = !isVisible;
+                });
+              },
+            ),
           ),
         );
       },

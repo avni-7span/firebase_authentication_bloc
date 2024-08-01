@@ -70,7 +70,10 @@ class SignUpCubit extends Cubit<SignUpState> {
             .collection('users')
             .doc(user.user!.uid)
             .set(
-              User(id: user.user!.uid, email: user.user?.email).toFireStore(),
+              User(
+                id: user.user!.uid,
+                email: user.user?.email,
+              ).toFireStore(),
             );
 
         emit(state.copyWith(status: FormzSubmissionStatus.success));

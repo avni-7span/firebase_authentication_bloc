@@ -14,6 +14,7 @@ void main() async {
       //   appId: "1:535095414450:web:126aef2e60d05dbad703ab",
       //   messagingSenderId: "535095414450",
       //   projectId: "bloc-autoroute-login",
+      //   storageBucket: "bloc-autoroute-login.appspot.com",
       // ),
       );
   final authenticationRepository = AuthenticationRepository();

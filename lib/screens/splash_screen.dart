@@ -16,9 +16,13 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    // Future.delayed(const Duration(seconds: 2),
-    //     () => context.replaceRoute(const CreateProfileRoute()));
     checkNavigation();
+  }
+
+  void checkNavigation() {
+    RepositoryProvider.of<AuthenticationRepository>(context).currentUser != null
+        ? context.replaceRoute(const UserHomeRoute())
+        : context.replaceRoute(const LoginRoute());
   }
 
   @override
@@ -31,11 +35,5 @@ class _SplashScreenState extends State<SplashScreen> {
         ),
       ),
     );
-  }
-
-  void checkNavigation() {
-    RepositoryProvider.of<AuthenticationRepository>(context).currentUser != null
-        ? context.replaceRoute(const UserHomeRoute())
-        : context.replaceRoute(const LoginRoute());
   }
 }

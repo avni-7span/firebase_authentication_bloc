@@ -1,14 +1,8 @@
-import 'package:auto_route/annotations.dart';
 import 'package:auto_route/auto_route.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebasebloc/modules/logout/cubit/log_out_cubit.dart';
+import 'package:firebasebloc/modules/user_home/cubit/home_cubit.dart';
 import 'package:firebasebloc/routes/router.gr.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:firebasebloc/core/models/user_model.dart' as user_model;
-import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 @RoutePage()
@@ -17,10 +11,14 @@ class UserHomeScreen extends StatefulWidget implements AutoRouteWrapper {
 
   @override
   Widget wrappedRoute(BuildContext context) {
-    return BlocProvider(
-      create: (context) => LogOutCubit(),
-      child: this,
-    );
+    return MultiBlocProvider(providers: [
+      BlocProvider(create: (context) => LogOutCubit()),
+      BlocProvider(
+        create: (context) => HomeCubit()
+          ..getUserCredentials()
+          ..getImageUrl(),
+      )
+    ], child: this);
   }
 
   @override
@@ -28,42 +26,8 @@ class UserHomeScreen extends StatefulWidget implements AutoRouteWrapper {
 }
 
 class _UserHomeScreenState extends State<UserHomeScreen> {
-  final uid = FirebaseAuth.instance.currentUser!.uid;
-  final storageRef = FirebaseStorage.instance.ref().child('Profile_Pics');
-  final fireStoreInstance = FirebaseFirestore.instance;
-  String? userImageUrl;
-  user_model.User _user = user_model.User.empty;
-
-  Future<String?> getImageUrl() async {
-    try {
-      final userImageURL = await storageRef.child(uid).getDownloadURL();
-      setState(() {
-        userImageUrl = userImageURL;
-      });
-    } catch (e) {}
-    return null;
-  }
-
-  Future<user_model.User?> getUserCredentials() async {
-    final docSnapshot =
-        await fireStoreInstance.collection('users').doc(uid).get();
-    if (docSnapshot.exists) {
-      final user = user_model.User.fromFireStore(docSnapshot);
-      setState(() {
-        _user = user;
-      });
-    } else {
-      print('User not found');
-    }
-    return null;
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    getImageUrl();
-    getUserCredentials();
-  }
+  static const profileFake =
+      'https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.istockphoto.com%2Fillustrations%2Fuser-profile&psig=AOvVaw1jaYo-1761V0TAiDGXJrQe&ust=1722581715641000&source=images&cd=vfe&opi=89978449&ved=0CBEQjRxqFwoTCPit9Yub04cDFQAAAAAdAAAAABAE';
 
   @override
   Widget build(BuildContext context) {
@@ -71,62 +35,98 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         appBar: AppBar(
           backgroundColor: Colors.blue,
         ),
-        body: Container(
-          margin: const EdgeInsets.all(10),
-          padding: const EdgeInsets.only(top: 8, bottom: 8),
-          color: Colors.grey,
-          height: 110,
-          width: MediaQuery.of(context).size.width,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Expanded(
-                flex: 1,
-                child: CircleAvatar(
-                  radius: 75,
-                  backgroundImage: userImageUrl == null
-                      ? const AssetImage('assets/fake_user_profile.webp')
-                      : NetworkImage(userImageUrl!),
+        body: BlocListener<HomeCubit, HomeState>(
+          listener: (context, state) {
+            if (state.status == HomeStateStatus.userLoading ||
+                state.status == HomeStateStatus.imageLoading) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Wait a moment...'),
                 ),
-              ),
-              Expanded(
-                flex: 2,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+              );
+            } else if (state.status == HomeStateStatus.failure) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Could not fetch '),
+                ),
+              );
+            }
+          },
+          child: BlocBuilder<HomeCubit, HomeState>(
+            builder: (context, state) {
+              return Container(
+                margin: const EdgeInsets.all(10),
+                padding: const EdgeInsets.only(top: 8, bottom: 8),
+                color: Colors.grey,
+                height: 110,
+                width: MediaQuery.of(context).size.width,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.email_outlined,
-                          color: Colors.white,
-                        ),
-                        Text(
-                          '   Email : ${_user.email} ',
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                              fontSize: 15, color: Colors.white),
-                        ),
-                      ],
+                    Expanded(
+                      flex: 1,
+                      child: CircleAvatar(
+                          radius: 75,
+                          backgroundImage:
+                              state.status == HomeStateStatus.imageLoading
+                                  ? const AssetImage(
+                                      'assets/fake_user_profile.webp')
+                                  : state.status == HomeStateStatus.userLoaded
+                                      ? NetworkImage(state.userImageUrl!)
+                                      : const AssetImage(
+                                          'assets/fake_user_profile.webp')),
                     ),
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.phone,
-                          color: Colors.white,
-                        ),
-                        Text(
-                          '  Contact : ${_user.phoneNumber}',
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                              fontSize: 15, color: Colors.white),
-                        ),
-                      ],
+                    Expanded(
+                      flex: 2,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.email_outlined,
+                                color: Colors.white,
+                              ),
+                              const SizedBox(width: 20),
+                              Text(
+                                state.status == HomeStateStatus.userLoading
+                                    ? '_____@gmail.com'
+                                    : state.status == HomeStateStatus.userLoaded
+                                        ? state.user.email!
+                                        : '',
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                    fontSize: 17, color: Colors.white),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.phone,
+                                color: Colors.white,
+                              ),
+                              const SizedBox(width: 20),
+                              Text(
+                                state.status == HomeStateStatus.userLoading
+                                    ? 'xxxxxxxxxx'
+                                    : state.status == HomeStateStatus.userLoaded
+                                        ? state.user.phoneNumber!
+                                        : 'xxxxxxxxxx',
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                    fontSize: 20, color: Colors.white),
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
                     )
                   ],
                 ),
-              )
-            ],
+              );
+            },
           ),
         ),
         floatingActionButton: const LogOutButton());

@@ -1,39 +1,19 @@
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:firebasebloc/core/repository/authentication_failure.dart';
 
-// extension on firebase_auth.User {
-//   /// Maps a [firebase_auth.User] into a [User].
-//
-//   User get toUser {
-//     return User(id: uid, email: email, name: displayName, photo: photoURL);
-//   }
-// }
-
 class AuthenticationRepository {
   final firebase_auth.FirebaseAuth _firebaseAuth;
 
   static final AuthenticationRepository _singleton =
       AuthenticationRepository._internal();
 
-  factory AuthenticationRepository() {
-    return _singleton;
-  }
+  factory AuthenticationRepository() => _singleton;
 
   AuthenticationRepository._internal()
       : _firebaseAuth = firebase_auth.FirebaseAuth.instance;
 
-  // static const userCacheKey = '__user_cache_key__';
-
-  firebase_auth.User? get currentUser {
-    return firebase_auth.FirebaseAuth.instance.currentUser;
-  }
-
-  // Stream<User> get user {
-  //   return _firebaseAuth.authStateChanges().map((firebaseUser) {
-  //     final user = firebaseUser == null ? User.empty : firebaseUser.toUser;
-  //     return user;
-  //   });
-  // }
+  firebase_auth.User? get currentUser =>
+      firebase_auth.FirebaseAuth.instance.currentUser;
 
   Future<firebase_auth.UserCredential> signUp({
     required String email,

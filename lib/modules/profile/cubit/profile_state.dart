@@ -1,41 +1,35 @@
 part of 'profile_cubit.dart';
 
+enum ProfileStateStatus {
+  initial,
+  loading,
+  loaded,
+  imagePickerLoading,
+  imagePickerLoaded,
+  imageIsNull,
+  failure
+}
+
 class ProfileState extends Equatable {
-  const ProfileState(
-      {this.profileImage,
-      this.phoneNumber = const PhoneNumber.pure(),
-      this.status = FormzSubmissionStatus.initial,
-      this.isValid = false,
-      this.imageError = false,
-      this.isLoading = false,
-      this.error});
+  const ProfileState({
+    this.profileImage,
+    this.phoneNumber = const PhoneNumber.pure(),
+    this.isValid = false,
+    this.status = ProfileStateStatus.initial,
+    this.error,
+  });
 
   final XFile? profileImage;
   final PhoneNumber phoneNumber;
-  final FormzSubmissionStatus status;
+  final ProfileStateStatus status;
   final bool isValid;
-  final bool imageError;
-  final bool isLoading;
   final String? error;
-
-  @override
-  List<Object?> get props => [
-        profileImage,
-        phoneNumber,
-        status,
-        isValid,
-        imageError,
-        isLoading,
-        error
-      ];
 
   ProfileState copyWith({
     XFile? profileImage,
     PhoneNumber? phoneNumber,
-    FormzSubmissionStatus? status,
+    ProfileStateStatus? status,
     bool? isValid,
-    bool? imageError,
-    bool? isLoading,
     String? error,
   }) {
     return ProfileState(
@@ -43,14 +37,11 @@ class ProfileState extends Equatable {
       phoneNumber: phoneNumber ?? this.phoneNumber,
       status: status ?? this.status,
       isValid: isValid ?? this.isValid,
-      imageError: imageError ?? this.imageError,
-      isLoading: isLoading ?? this.isLoading,
       error: error ?? this.error,
     );
   }
-}
 
-// final class ProfileInitial extends ProfileState {
-//   @override
-//   List<Object> get props => [];
-// }
+  @override
+  List<Object?> get props =>
+      [profileImage, phoneNumber, status, isValid, error];
+}

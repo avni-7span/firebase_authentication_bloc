@@ -13,9 +13,8 @@ class User extends Equatable {
 
   static const empty = User(id: '');
 
-  bool get isEmpty => this == User.empty;
-
-  bool get isNotEmpty => this != User.empty;
+  // bool get isEmpty => this == User.empty;
+  // bool get isNotEmpty => this != User.empty;
 
   @override
   List<Object?> get props => [email, id, phoneNumber, imageURL];
@@ -24,8 +23,8 @@ class User extends Equatable {
     return {
       if (email != null) "email": email,
       if (id != null) "id": id,
-      if (phoneNumber != null) "phoneNumber": phoneNumber,
-      if (imageURL != null) 'imageURL': imageURL
+      if (phoneNumber != null) "phone_number": phoneNumber,
+      if (imageURL != null) 'image_url': imageURL
     };
   }
 
@@ -34,7 +33,7 @@ class User extends Equatable {
     return User(
         id: data?['id'],
         email: data?['email'],
-        phoneNumber: data?['phone number'],
-        imageURL: data?['image url']);
+        phoneNumber: data?['phone_number'],
+        imageURL: data?['image_url']);
   }
 }

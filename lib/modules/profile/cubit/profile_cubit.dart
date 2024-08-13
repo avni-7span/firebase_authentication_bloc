@@ -7,7 +7,6 @@ import 'package:firebasebloc/core/repository/authentication_repository.dart';
 import 'package:firebasebloc/core/validators/phone_number.dart';
 import 'package:formz/formz.dart';
 import 'package:image_picker/image_picker.dart';
-
 part 'profile_state.dart';
 
 class ProfileCubit extends Cubit<ProfileState> {
@@ -88,6 +87,6 @@ class ProfileCubit extends Cubit<ProfileState> {
     await db
         .collection('users')
         .doc(authInstance.currentUser!.uid)
-        .update({'phone number': phoneNumber, 'image url': userImageURL});
+        .update({'phone_number': phoneNumber, 'image_url': userImageURL});
   }
 }
